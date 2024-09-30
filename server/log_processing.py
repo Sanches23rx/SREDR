@@ -54,7 +54,7 @@ def log_collector(filename):
             yield line
 
 
-def EXECVEL_inserting_in_DB(logs, conn):
+def EXECVE_template(logs, conn):
     cur = conn.cursor()
     insert_query = sql.SQL("""
             INSERT INTO {EXECVEL} (hostname, event_type, cmdargs)
@@ -63,19 +63,10 @@ def EXECVEL_inserting_in_DB(logs, conn):
     
     data_to_insert = (f'{logs[0]}', f'{logs[1]}' , f'{logs[2]}')
     
-    try:
-        cur.execute(insert_query, data_to_insert)
-        conn.commit()
-        print("Данные успешно вставлены")
-    except Exception as e:
-        print(f"Ошибка при вставке данных: {e}")
-        conn.rollback()
-    finally:
-        cur.close()
+    push_to_DB(conn, insert_query, data_to_insert)
 
 
-def SYSCALL_inserting_in_DB(logs, conn):
-    cur = conn.cursor()
+def SYSCALL_template(logs, conn):
     insert_query = sql.SQL("""
             INSERT INTO {SYSCALL} (parsed_log, event_type, pid, ppid, cmdline, exe_path)
             VALUES (%s, %s, %s, %s, %s, %s)
@@ -83,6 +74,11 @@ def SYSCALL_inserting_in_DB(logs, conn):
     
     data_to_insert = (f'{logs[0]}', f'{logs[1]}', f'{logs[2]}' , f'{logs[3]}' , f'{logs[4]}' , f'{logs[5]}')
 
+    push_to_DB(conn, insert_query, data_to_insert)
+
+
+def push_to_DB(conn, insert_query, data_to_insert):
+    cur = conn.cursor()
     try:
         cur.execute(insert_query, data_to_insert)
         conn.commit()
@@ -94,11 +90,11 @@ def SYSCALL_inserting_in_DB(logs, conn):
         cur.close()
 
 
-def insert_logs_to_clickhouse(logs, conn):
+def insert_logs_to_DB(logs, conn):
     if len(logs) == 6:
-       SYSCALL_inserting_in_DB(logs, conn)
+       SYSCALL_template(logs, conn)
     elif len(logs) == 3:
-        EXECVEL_inserting_in_DB(logs, conn)
+        EXECVE_template(logs, conn)
 
 
 def log_monitor():
@@ -107,6 +103,6 @@ def log_monitor():
 
     for line in log_collector(log_file):
         parsed_log = log_parser(line)
-        insert_logs_to_clickhouse(parsed_log, conn)
+        insert_logs_to_DB(parsed_log, conn)
         # check_susp(parsed_log) how postprocessing after sending to DB
         # print(parsed_log) test print
