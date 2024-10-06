@@ -1,9 +1,6 @@
 import time
 import os
 import re
-import psycopg2
-from psycopg2 import sql
-# from clickhouse_driver import Client
 
 def connect_DB():
     conn = psycopg2.connect(
@@ -34,6 +31,9 @@ def log_parser(line):
         cmdargs = (re.search(r'a0.+$', line)).group(0).strip()
 
         parsed_log = (hostname, event_type, cmdargs)
+
+    else:
+        parsed_log = ''
 
     if parsed_log == None:
         pass
@@ -99,10 +99,10 @@ def insert_logs_to_DB(logs, conn):
 
 def log_monitor():
     log_file = '/var/log/audit/audit.log'
-    conn = connect_DB()
+    # conn = connect_DB()
 
     for line in log_collector(log_file):
         parsed_log = log_parser(line)
-        insert_logs_to_DB(parsed_log, conn)
+        # insert_logs_to_DB(parsed_log, conn)
         # check_susp(parsed_log) how postprocessing after sending to DB
-        # print(parsed_log) test print
+        print(parsed_log) # test print

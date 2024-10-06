@@ -9,13 +9,13 @@ fi
 # Установка необходимых пакетов
 echo "Установка зависимостей..."
 apt update
-apt install -y auditd audispd-plugins python3 postgresql-client
+apt install -y auditd audispd-plugins python3
 
 # Изменение конфигурационных файлов и правил детектирования
 AUDITD_CONF="/etc/audit/auditd.conf"
 
 rm /etc/audit/rules.d/audit.rules
-cp ./audit.rules /etc/audit/rules.d/audit.rules
+cp ./data/audit.rules /etc/audit/rules.d/audit.rules
 
 AUDISP_REM_CONF="/etc/audit/audisp-remote.conf"
 AUREMOTE_CONF="/etc/audit/plugins.d/au-remote.conf"

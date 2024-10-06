@@ -9,7 +9,7 @@ fi
 # Установка необходимых пакетов
 echo "Установка зависимостей..."
 apt update
-apt install -y auditd audispd-plugins python3 clickhouse-server clickhouse-client postgresql
+apt install -y auditd audispd-plugins python3
 
 # Изменение конфигурационных файлов и правил детектирования
 AUDITD_CONF="/etc/audit/auditd.conf"
