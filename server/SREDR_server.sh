@@ -9,7 +9,9 @@ fi
 # Установка необходимых пакетов
 echo "Установка зависимостей..."
 apt update
-apt install -y auditd audispd-plugins python3 sqlite3
+apt install -y auditd audispd-plugins python3 sqlite3 pip
+pip install flask
+apt install python3-flask
 
 # Изменение конфигурационных файлов и правил детектирования
 AUDITD_CONF="/etc/audit/auditd.conf"
