@@ -9,7 +9,7 @@ fi
 # Установка необходимых пакетов
 echo "Установка зависимостей..."
 apt update
-apt install -y auditd audispd-plugins python3
+apt install -y auditd audispd-plugins python3 sqlite3
 
 # Изменение конфигурационных файлов и правил детектирования
 AUDITD_CONF="/etc/audit/auditd.conf"
@@ -23,7 +23,7 @@ sed -i 's/^name_format = .*/name_format = hostname/' "$AUDITD_CONF"
 # Перезагрузка служб
 echo "Перезагрузка служб auditd и audispd..."
 systemctl restart auditd
-systemctl restart clickhouse-server
+systemctl restart sqlite3
 
 echo "Скрипт завершен. Пакеты установлены, конфигурации изменены и службы перезагружены."
 
