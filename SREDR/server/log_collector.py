@@ -11,7 +11,7 @@ HOST_WIN = '192.168.58.183'
 PORT_WIN = 61
 
 HOST_LNX = '192.168.58.183'
-PORT_LNX = 60
+PORT_LNX = 63
 
 def write_host_info(log_type, addr, data):
     conn = sqlite3.connect('data.db')

@@ -22,7 +22,7 @@ AUREMOTE_CONF="/etc/audit/plugins.d/au-remote.conf"
 
 echo "Изменение конфигурационных файлов..."
 sed -i 's/^remote_server = .*/remote_server = <your_ip>/' "$AUDISP_REM_CONF"
-sed -i 's/^port = .*/port = 60/' "$AUDISP_REM_CONF"
+sed -i 's/^port = .*/port = 63/' "$AUDISP_REM_CONF"
 sed -i 's/^name_format = .*/name_format = hostname/' "$AUDITD_CONF"
 sed -i 's/^active = .*/active = yes/' "$AUREMOTE_CONF"
 
