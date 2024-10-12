@@ -5,13 +5,13 @@ import os
 from multiprocessing import Process
 import subprocess
 
-uniqID='1a2b3c4d'
+userID='1a2b3c4d'
 
 # Параметры сервера
 #REMOTE_HOST = '192.168.12.77'
 #REMOTE_PORT = 61
 
-REMOTE_HOST = '192.168.1.11'
+REMOTE_HOST = '192.168.58.129'
 REMOTE_PORT = 61
 
 #events
@@ -22,7 +22,7 @@ system_eventlog = win32evtlog.OpenEventLog(None, 'System')
 security_eventlog = win32evtlog.OpenEventLog(None, 'Security')
 application_eventlog = win32evtlog.OpenEventLog(None, 'Applitcation')
 
-def event_handler(): #ОБработка правил
+def event_handler(): #Обработка правил
      #
      pass
 
@@ -35,20 +35,21 @@ def win_log_collector():
     return system_events, security_events, application_events
 
 def get_hostinfo():
-    #uniqID
-    system_name = subprocess.check_output(['cmd', '/c', 'hostname'])
-    os_info = subprocess.check_output(['cmd', '/c', 'ver'])
+    #userID
+    hostname = subprocess.check_output(['cmd', '/c', 'hostname']).decode("utf-8").replace('\n', '').replace('\r', '')
+    os_ver_info = subprocess.check_output(['cmd', '/c', 'ver']).decode("utf-8").replace('\n', '').replace('\r', '')
     
+    return userID + ',' + hostname + ', ' + os_ver_info
     #currentuser = 
 
 
-    data_hash = 
 
 # Клиент TCP
 def client_run():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((REMOTE_HOST, REMOTE_PORT))
-        s.sendall(bytes('!INIT,' + '\n', encoding='utf-8'))
+        s.sendall(bytes('!INIT,' + get_hostinfo() + '\n', encoding='utf-8'))
+        print('!INIT,' + get_hostinfo() +  '\n')
         while True:
             try:
                 events = []
@@ -63,7 +64,7 @@ def client_run():
                     if str(event.EventID) in collect_evt_list:
                         message = f"{event.EventID};{event.EventType};{event.Sid};{event.Reserved};{event.SourceName};{event.ComputerName};{event.StringInserts[0] if event.StringInserts else 'No message'};{event.TimeWritten if event.TimeWritten else '0'}"
                         print(message[:140])
-                        #s.sendall(message.encode('utf-8'))
+                        s.sendall(message.encode('utf-8'))
 
             except Exception as e:
                 print(f"Ошибка при отправке данных: {e}")

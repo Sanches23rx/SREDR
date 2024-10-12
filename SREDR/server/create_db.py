@@ -23,7 +23,7 @@ def create_db():
      ''')
     cursor.execute('''
          CREATE TABLE IF NOT EXISTS endpoints (
-             ip TEXT, os_type TEXT
+             ip TEXT, os_type TEXT, hostname TEXT, os_ver_info TEXT, userID TEXT
          )
      ''')
     # Добавим несколько записей для примера

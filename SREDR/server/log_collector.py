@@ -7,28 +7,33 @@ import datetime
 #HOST = '192.168.12.77'
 #PORT = 61
 
-HOST_WIN = '192.168.1.11'
+HOST_WIN = '192.168.58.183'
 PORT_WIN = 61
 
-HOST_LNX = '192.168.1.11'
+HOST_LNX = '192.168.58.183'
 PORT_LNX = 60
 
-def write_host_info(log_type, addr):
+def write_host_info(log_type, addr, data):
     conn = sqlite3.connect('data.db')
     cursor = conn.cursor()
+    data = data.rstrip().split(',')
+    userID = data[1]
+    hostname = data[2]
+    os_ver_info = data[3]
 
-    if len(cursor.execute(f"SELECT ip FROM endpoints WHERE ip == '{addr}'").fetchall()) == 0:
-        cursor.execute(f"INSERT INTO endpoints VALUES (?, ?)", (addr,log_type))
-        print('New ip added')
+    if len(cursor.execute(f"SELECT userID FROM endpoints WHERE userID == '{userID}'").fetchall()) == 0:
+        cursor.execute(f"INSERT INTO endpoints VALUES (?, ?,?,?,?)", (addr,log_type,hostname,os_ver_info,userID,))
+        print('New ip added',addr,log_type,hostname,os_ver_info,userID)
 
     conn.commit()
     conn.close()
 
 
-def write_log_to_db(log_type, data):
+def write_log_to_db(log_type, addr, data):
     conn = sqlite3.connect('data.db')
     cursor = conn.cursor()
 
+    data = str(data) + str(addr)
     cursor.execute(f"INSERT INTO {log_type} VALUES (?)", (data,))
     #print('Data wirited:', data[:30])
     #print(cursor.execute(f"SELECT COUNT(*) FROM {log_type}").fetchall())
@@ -39,18 +44,22 @@ def write_log_to_db(log_type, data):
 # Обработчик подключения, поток забирает себе эту функцию
 def handle_client(conn, addr, log_type):
     print('[NEW CONNECTION] - Connected by:', addr)
-    write_host_info(log_type, addr[0])
     connected = True
     try:
         while connected:
             print('wait:', str(datetime.datetime.now()))
             try:
                 data = conn.recv(6096).decode('utf-8')
+                print(data)
                 if not data:
                     break
+                if '!INIT' in data[:5]:
+                    write_host_info(log_type, addr[0], data)
+
                 if data == '!DISCONNECT':
                     connected = False
-                write_log_to_db(log_type, addr[0])
+
+                write_log_to_db(log_type, addr[0], data)
                 print('Received:', data[:30], ' - ', data[-30:], ', ip:', str(addr))
             except Exception as e:
                 print('Ошибка получения данных:', e)
