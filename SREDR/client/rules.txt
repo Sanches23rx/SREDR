@@ -1,0 +1,6 @@
+##! Comment line
+#! Detect anomaly process, fields, actions in cmd
+process_name:'12345.exe'
+process_pid:'666'
+!action:Taskkill /PID process_pid /F
+#! Next rule
